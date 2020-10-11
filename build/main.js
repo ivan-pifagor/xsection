@@ -1,4 +1,4 @@
-import { BoxGeometry, EdgesGeometry, Geometry, LineDashedMaterial, LineSegments, PerspectiveCamera, Points, PointsMaterial, Scene, Vector3, WebGLRenderer } from 'three';
+import { BoxGeometry, EdgesGeometry, LineDashedMaterial, LineSegments, PerspectiveCamera, Points, PointsMaterial, Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
 const init = () => {
     const renderer = getRenderer();
@@ -43,20 +43,5 @@ const onResize = (renderer, camera) => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-};
-const getCuboidGeometry = (topBackRightCorner, bottomFrontLeftCorner) => {
-    const directionOfChange = topBackRightCorner.sub(bottomFrontLeftCorner);
-    const X = new Vector3(directionOfChange.x, 0, 0);
-    const Y = new Vector3(0, directionOfChange.y, 0);
-    const Z = new Vector3(0, 0, directionOfChange.z);
-    const topBackLeftCorner = topBackRightCorner.sub(X);
-    const topFrontRightCorner = topBackRightCorner.sub(Y);
-    const bottomBackRightCorner = topBackRightCorner.sub(Z);
-    const bottomFrontRightCorner = bottomFrontLeftCorner.sub(X);
-    const bottomBackLeftCorner = bottomFrontLeftCorner.sub(Y);
-    const topFrontLeftCorner = bottomFrontLeftCorner.sub(Z);
-    const geometry = new Geometry();
-    geometry.vertices.push(topFrontLeftCorner, topFrontRightCorner, topBackLeftCorner, topBackRightCorner, bottomFrontLeftCorner, bottomFrontRightCorner, bottomBackLeftCorner, bottomBackRightCorner);
-    return geometry;
 };
 init();
