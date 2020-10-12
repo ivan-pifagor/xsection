@@ -1,75 +1,56 @@
-
-
-import {
-    BoxGeometry,
-    EdgesGeometry,
-    LineDashedMaterial,
-    LineSegments,
-    PerspectiveCamera,
-    Points,
-    PointsMaterial,
-    Scene,
-    WebGLRenderer
-} from 'three';
+import { CubeGeometry } from "./GeometryCube";
+import { PerspectiveCamera, Raycaster, Vector2, WebGLRenderer, Scene } from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
+import { IColoredObjectPart } from "./IColoredObjectPart";
 
-const init = () => {
-    const renderer = getRenderer()
-    
-    const scene = new Scene();
-    
-    const camera = new PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(200, 40, 10);
-    
-    const render = () => renderer.render(scene, camera);
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.addEventListener('change', render);
-    controls.minDistance = 20;
-    controls.maxDistance = 500;
-    controls.enablePan = false;
+const scene = new Scene();
 
-    const geometry = new BoxGeometry(50, 50, 50, 10, 10, 10);
-    const edgeGeometry = new EdgesGeometry(geometry);
-    const material = new LineDashedMaterial({
-        color: 0xffffff,
-        linewidth: 1,
-        scale: 1,
-        dashSize: 3,
-        gapSize: 1,
-    });
-    const lines = new LineSegments(edgeGeometry, material);
+const renderer = new WebGLRenderer({
+    canvas: document.getElementById("canvas-id") as HTMLCanvasElement
+})
 
-    const dotMaterial = new PointsMaterial({ 
-        color: 0xff0000,
-        size: 1,
-        sizeAttenuation: false
-    });
-    const dot = new Points(edgeGeometry, dotMaterial);
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-    scene.add(lines);
-    scene.add(dot);
+const cube = new CubeGeometry(20);
+scene.add(cube);
 
-    render();
+const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+const orbitControls = new OrbitControls(camera, renderer.domElement);
 
-    window.addEventListener('resize', () => onResize(renderer, camera), false);
+const raycaster = new Raycaster();
+const mouse = new Vector2();
 
+camera.position.set(0, 0, 100);
+orbitControls.update();
+//orbitControls.saveState();
+render();
+
+function render() {
+    requestAnimationFrame(render);
+    orbitControls.update();
+
+    raycaster.setFromCamera(mouse, camera);
+
+    cube.makeSpheresOriginalColor();
+    cube.makeEdgesOriginalColor();
+
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    if (intersects.length > 0) {
+        const hoverObject = intersects[0].object as unknown as IColoredObjectPart;
+        hoverObject.changeColorToHover();
+    }
+
+    renderer.render(scene, camera);
 }
 
-const getRenderer = () => {
-    const renderer = new WebGLRenderer();
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    window.document.body.appendChild(renderer.domElement);
-    return renderer;
-}
+window.addEventListener('mousemove', (event) => {
+    event.preventDefault();
 
-const onResize = (renderer: WebGLRenderer, camera: PerspectiveCamera) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+}, false);
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-}
-
-init();
+document.getElementById("canvas-id")?.addEventListener("click", (event) => {
+    /*scene.getObjectById(hoveredObjectId).originalColor = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    scene.getObjectById(hoveredObjectId).hoverColor = new THREE.MeshBasicMaterial({ color: 0x00ff00 });*/
+})
