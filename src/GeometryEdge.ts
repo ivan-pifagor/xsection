@@ -1,27 +1,31 @@
-import { BufferGeometry, Line, LineBasicMaterial, Vector3 } from "three";
-import { IColoredObjectPart } from "./IColoredObjectPart";
+import { BufferGeometry, Color, Line, LineBasicMaterial, Vector3 } from "three";
+import { ColorConstants } from "./ColorConstants";
+import { IMaterialObjectPart } from "./IMaterialObjectPart";
 
-export class GeometryEdge extends Line implements IColoredObjectPart {
-    private hoverColor: number;
-    private originalColor: number;
+export class GeometryEdge extends Line implements IMaterialObjectPart {
+    private hoverColor: Color;
+    private unhoverColor: Color;
     
     constructor(points: Vector3[]) {
         const geometry = new BufferGeometry().setFromPoints(points);
-        const material = new LineBasicMaterial({ color: 0xffff00 });
+        const material = new LineBasicMaterial();
+        material.color = ColorConstants.DEFAULT_UNHOVER_COLOR;
         super(geometry, material);
         
-        this.originalColor = 0xffff00;
-        this.hoverColor = 0xff0000;
+        this.hoverColor = ColorConstants.DEFAULT_HOVER_COLOR;
+        this.unhoverColor = ColorConstants.DEFAULT_UNHOVER_COLOR;
     }
 
-    changeColorToHover(): void {
-        this.material = new LineBasicMaterial( {color: this.hoverColor });
+    hover(): void {
+        const material = this.material as LineBasicMaterial;
+        material.color = this.hoverColor;
     }
-    changeColorToOriginal(): void {
-        this.material = new LineBasicMaterial({ color: this.originalColor });
+    unhover(): void {
+        const material = this.material as LineBasicMaterial;
+        material.color = this.unhoverColor;
     }
-    updateColorsAfterClick(): void {
-        this.hoverColor = 0x00ff00;
-        this.originalColor = 0x0000ff;
+    updateMaterials(): void {
+        this.hoverColor = ColorConstants.SELECTED_HOVER_COLOR;
+        this.unhoverColor = ColorConstants.SELECTED_UNHOVER_COLOR;
     }
 }

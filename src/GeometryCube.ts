@@ -4,10 +4,8 @@ import { GeometryObject } from "./GeometryObject";
 import { GeometryVertex } from "./GeometryVertex";
 
 export class CubeGeometry extends GeometryObject {
-    edgeLength: number;
     constructor(edgeLength: number) {
         super();
-        this.edgeLength = edgeLength;
 
         const vertex1 = new Vector3(-edgeLength, -edgeLength, -edgeLength);
         const vertex2 = new Vector3(-edgeLength, edgeLength, -edgeLength);
@@ -43,19 +41,11 @@ export class CubeGeometry extends GeometryObject {
             new GeometryVertex(vertex7),
             new GeometryVertex(vertex8)
         ]
-        this.vertices = vertices;
 
+        this.vertices = vertices;
         this.edges = edges;
 
         this.edges.forEach(edge => this.add(edge));
         this.vertices.forEach(vertex => this.add(vertex));
-    }
-
-    makeSpheresOriginalColor() {
-        this.Vertices.forEach(ch => ch.changeColorToOriginal());
-    }
-
-    makeEdgesOriginalColor() {
-        this.Edges.forEach(ch => ch.changeColorToOriginal());
     }
 }
